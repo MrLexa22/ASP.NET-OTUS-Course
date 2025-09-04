@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Services.Abstractions;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -15,11 +16,11 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class RolesController
     {
-        private readonly IRepository<Role> _rolesRepository;
+        private readonly IRoleService _rolesService;
 
-        public RolesController(IRepository<Role> rolesRepository)
+        public RolesController(IRoleService rolesService)
         {
-            _rolesRepository = rolesRepository;
+            _rolesService = rolesService;
         }
 
         /// <summary>
@@ -29,17 +30,9 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet]
         public async Task<List<RoleItemResponse>> GetRolesAsync()
         {
-            var roles = await _rolesRepository.GetAllAsync();
+            var roles = await _rolesService.GetRolesAsync();
 
-            var rolesModelList = roles.Select(x =>
-                new RoleItemResponse()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList();
-
-            return rolesModelList;
+            return roles;
         }
     }
 }
