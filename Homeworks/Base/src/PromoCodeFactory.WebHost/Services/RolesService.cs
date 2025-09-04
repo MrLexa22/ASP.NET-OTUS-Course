@@ -4,9 +4,7 @@ using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Mappers;
 using PromoCodeFactory.WebHost.Models;
 using PromoCodeFactory.WebHost.Services.Abstractions;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromoCodeFactory.WebHost.Services

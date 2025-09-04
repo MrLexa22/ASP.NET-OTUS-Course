@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using PromoCodeFactory.WebHost.Models;
 using System.Threading.Tasks;
 using System;
 using PromoCodeFactory.WebHost.ExceptionHandling;
