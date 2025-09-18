@@ -64,6 +64,10 @@ namespace PromoCodeFactory.WebHost.Controllers
             return Ok(updateEmployee);
         }
 
+        /// <summary>
+        /// Удаление сотрудника
+        /// </summary>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteEmployeeAsync(Guid id)
         {

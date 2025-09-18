@@ -4,26 +4,51 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.DataAccess;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
 using PromoCodeFactory.WebHost.Middlewares;
-using PromoCodeFactory.WebHost.Services.Abstractions;
 using PromoCodeFactory.WebHost.Services;
+using PromoCodeFactory.WebHost.Services.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.WebHost
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(typeof(IRepository<Employee>), (x) => 
-                new InMemoryRepository<Employee>(FakeDataFactory.Employees));
-            services.AddSingleton(typeof(IRepository<Role>), (x) => 
-                new InMemoryRepository<Role>(FakeDataFactory.Roles));
+
+            if (Configuration.GetConnectionString("Default") == null)
+            {
+                services.AddSingleton(typeof(IRepository<Employee>), (x) =>
+                    new InMemoryRepository<Employee>(FakeDataFactory.Employees));
+                services.AddSingleton(typeof(IRepository<Role>), (x) =>
+                    new InMemoryRepository<Role>(FakeDataFactory.Roles));
+                services.AddSingleton(typeof(IRepository<Preference>), (x) =>
+                    new InMemoryRepository<Preference>(FakeDataFactory.Preferences));
+                services.AddSingleton(typeof(IRepository<Customer>), (x) =>
+                    new InMemoryRepository<Customer>(FakeDataFactory.Customers));
+            }
+            else
+            {
+                services.AddDbContext<DataContext>(options =>
+                    options.UseSqlite(Configuration.GetConnectionString("Default")));
+
+                services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+                services.AddScoped<IDbInitializer, EfDbInitializer>();
+            }
 
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IRoleService, RolesService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IPreferenceService, PreferenceService>();
 
             services.AddOpenApiDocument(options =>
             {
@@ -59,6 +84,11 @@ namespace PromoCodeFactory.WebHost
             {
                 endpoints.MapControllers();
             });
+
+            // Попытка инициализации БД только если сервис зарегистрирован
+            using var scope = app.ApplicationServices.CreateScope();
+            var dbInitializer = scope.ServiceProvider.GetService<IDbInitializer>();
+            dbInitializer?.InitializeDb();
         }
     }
 }

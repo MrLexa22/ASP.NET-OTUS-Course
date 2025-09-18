@@ -52,5 +52,34 @@ namespace PromoCodeFactory.DataAccess.Repositories
         {
             return Task.FromResult(Data.AsQueryable().Where(predicate).AsEnumerable());
         }
+
+        public Task<List<T>> ListAsync(
+    Expression<Func<T, bool>> predicate = null,
+    Func<IQueryable<T>, IQueryable<T>> include = null,
+    bool asNoTracking = true)
+        {
+            IQueryable<T> query = Data.AsQueryable();
+            if (predicate != null)
+                query = query.Where(predicate);
+            return Task.FromResult(query.ToList());
+        }
+
+        public Task<T> GetSingleAsync(
+            Expression<Func<T, bool>> predicate,
+            Func<IQueryable<T>, IQueryable<T>> include = null,
+            bool asNoTracking = true)
+        {
+            var result = Data.AsQueryable().FirstOrDefault(predicate);
+            return Task.FromResult(result);
+        }
+
+        public Task<T> GetByIdAsync(
+            Guid id,
+            Func<IQueryable<T>, IQueryable<T>> include,
+            bool asNoTracking = true)
+        {
+            var entity = Data.FirstOrDefault(e => e.Id == id);
+            return Task.FromResult(entity);
+        }
     }
 }
