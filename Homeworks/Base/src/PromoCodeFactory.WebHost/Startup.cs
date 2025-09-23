@@ -49,6 +49,7 @@ namespace PromoCodeFactory.WebHost
             services.AddScoped<IRoleService, RolesService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IPreferenceService, PreferenceService>();
+            services.AddScoped<IPromocodeService, PromocodesService>();
 
             services.AddOpenApiDocument(options =>
             {

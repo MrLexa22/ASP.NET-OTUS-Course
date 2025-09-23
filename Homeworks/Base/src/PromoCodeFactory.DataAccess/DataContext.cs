@@ -73,7 +73,7 @@ namespace PromoCodeFactory.DataAccess
             modelBuilder.Entity<PromoCode>(b =>
             {
                 b.Property(p => p.Code).HasMaxLength(64).IsRequired();
-                b.HasIndex(p => p.Code).IsUnique();
+                //b.HasIndex(p => p.Code).IsUnique();
                 b.Property(p => p.ServiceInfo).HasMaxLength(256);
 
                 b.HasOne(p => p.Preference)
