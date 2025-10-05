@@ -38,8 +38,9 @@ namespace PromoCodeFactory.WebHost
             services.AddScoped<IDbInitializer, EfDbInitializer>();
             services.AddDbContext<DataContext>(x =>
             {
-                x.UseSqlite("Filename=PromoCodeFactoryDb.sqlite");
-                //x.UseNpgsql(Configuration.GetConnectionString("PromoCodeFactoryDb"));
+                //x.UseSqlite("Filename=PromoCodeFactoryDb.sqlite");
+                var connString = Configuration.GetConnectionString("PromoCodeFactoryDb");
+                x.UseNpgsql(connString);
                 x.UseSnakeCaseNamingConvention();
                 x.UseLazyLoadingProxies();
             });
