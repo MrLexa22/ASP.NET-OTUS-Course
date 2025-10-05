@@ -32,8 +32,6 @@ jobs:
         ls -la ./Homeworks/UnitTests/src/
         echo "Looking for .sln files:"
         find ./Homeworks/UnitTests/src/ -name "*.sln"
-        echo "Looking for .csproj files:"
-        find ./Homeworks/UnitTests/src/ -name "*.csproj"
         
     - name: Restore dependencies
       run: dotnet restore PromoCodeFactory.sln
@@ -63,9 +61,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
     - name: Run Docker Compose Integration Tests
       run: |
         cd ./Homeworks/UnitTests/src
+        
+        # Проверяем версию Docker и Compose
+        echo "Docker version:"
+        docker --version
+        echo "Docker Compose version:"
+        docker compose version
         
         # Используем существующий docker-compose.yml как основу
         cp docker-compose.yml docker-compose.test.yml
@@ -73,9 +80,12 @@ jobs:
         # Заменяем пароль на тестовый
         sed -i 's/password123/test_password/g' docker-compose.test.yml
         
-        # Запускаем сервисы
+        echo "Contents of docker-compose.test.yml:"
+        cat docker-compose.test.yml
+        
+        # Запускаем сервисы (используем docker compose без дефиса)
         echo "Building and starting services..."
-        docker-compose -f docker-compose.test.yml up -d --build
+        docker compose -f docker-compose.test.yml up -d --build
         
         # Ждем готовности сервисов
         echo "Waiting for services to be ready..."
@@ -83,7 +93,7 @@ jobs:
         
         # Проверяем статус контейнеров
         echo "Checking container status..."
-        docker-compose -f docker-compose.test.yml ps
+        docker compose -f docker-compose.test.yml ps
         
         # Тестируем API endpoints
         echo "Testing API endpoints..."
@@ -109,17 +119,17 @@ jobs:
       run: |
         cd ./Homeworks/UnitTests/src
         echo "=== Container Status ==="
-        docker-compose -f docker-compose.test.yml ps
+        docker compose -f docker-compose.test.yml ps
         echo "=== Application Logs ==="
-        docker-compose -f docker-compose.test.yml logs promocodefactory.webhost
+        docker compose -f docker-compose.test.yml logs promocodefactory.webhost
         echo "=== Database Logs ==="
-        docker-compose -f docker-compose.test.yml logs postgres
+        docker compose -f docker-compose.test.yml logs postgres
         
     - name: Cleanup
       if: always()
       run: |
         cd ./Homeworks/UnitTests/src
-        docker-compose -f docker-compose.test.yml down -v
+        docker compose -f docker-compose.test.yml down -v
 
   build-and-push:
     name: Build & Push Docker Images  
