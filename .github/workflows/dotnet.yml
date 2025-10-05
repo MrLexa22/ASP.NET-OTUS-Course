@@ -25,6 +25,16 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
+    - name: List files in directory (debug)
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Files in Homeworks/UnitTests/src:"
+        ls -la ./Homeworks/UnitTests/src/
+        echo "Looking for .sln files:"
+        find ./Homeworks/UnitTests/src/ -name "*.sln"
+        echo "Looking for .csproj files:"
+        find ./Homeworks/UnitTests/src/ -name "*.csproj"
+        
     - name: Restore dependencies
       run: dotnet restore PromoCodeFactory.sln
       working-directory: ./Homeworks/UnitTests/src
