@@ -1,0 +1,89 @@
+/* Общая сетка контейнера */
+.factsContainer {
+   display: grid;
+   gap: 16px;
+   padding: 16px;
+   grid-template-columns: 1fr;
+}
+
+/* Адаптивная сетка */
+@media (min-width: 640px) {
+   .factsContainer {
+      grid-template-columns: repeat(2, 1fr);
+   }
+}
+
+@media (min-width: 1024px) {
+   .factsContainer {
+      grid-template-columns: repeat(3, 1fr);
+   }
+}
+
+/* Карточка факта */
+.blockFact {
+   background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+   border-radius: 12px;
+   padding: 16px;
+   box-shadow: 0 6px 18px rgba(20, 40, 80, 0.06);
+   border: 1px solid rgba(20, 40, 80, 0.04);
+   transition: transform .15s ease, box-shadow .15s ease;
+   display: flex;
+   flex-direction: column;
+   min-height: 88px;
+}
+
+/* Взаимодействие */
+.blockFact:hover {
+   transform: translateY(-6px);
+   box-shadow: 0 12px 30px rgba(20, 40, 80, 0.10);
+}
+
+/* Текст факта */
+.factText {
+   font-size: 16px;
+   color: #0f1724;
+   margin: 0 0 10px 0;
+   line-height: 1.45;
+   word-break: break-word;
+}
+
+/* Мелкий текст с длиной */
+.factLingthText {
+   font-size: 12px;
+   color: #64748b;
+   margin: 0;
+   align-self: flex-end;
+   background: rgba(99, 102, 241, 0.06);
+   padding: 4px 8px;
+   border-radius: 999px;
+   border: 1px solid rgba(99, 102, 241, 0.08);
+}
+
+/* Удобные отступы для списка */
+.factsContainer+.pagination {
+   margin-top: 16px;
+   display: flex;
+   gap: 8px;
+   flex-wrap: wrap;
+   align-items: center;
+}
+
+/* Кнопки пагинации (пример стилей) */
+button {
+   cursor: pointer;
+   padding: 6px 10px;
+   border-radius: 8px;
+   border: 1px solid rgba(15, 23, 36, 0.06);
+   background: #fff;
+   transition: background .12s, transform .08s;
+}
+
+button:hover:not([disabled]) {
+   background: #f1f5f9;
+   transform: translateY(-1px);
+}
+
+button[disabled] {
+   opacity: 0.6;
+   cursor: default;
+}

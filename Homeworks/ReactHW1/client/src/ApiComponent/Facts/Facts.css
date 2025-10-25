@@ -1,0 +1,50 @@
+/* Контейнер пагинации: центр, перенос и равные отступы */
+.pagination {
+   margin-top: 16px;
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   gap: 8px;
+   align-items: center;
+   padding: 0 12px;
+   box-sizing: border-box;
+}
+
+/* Кнопки пагинации */
+.pageButton {
+   cursor: pointer;
+   padding: 8px 12px;
+   border-radius: 8px;
+   border: 1px solid rgba(15, 23, 36, 0.06);
+   background: #fff;
+   transition: background 0.12s, transform 0.08s;
+   min-width: 48px;
+   text-align: center;
+}
+
+/* Поведение при наведении и выключенном состоянии */
+.pageButton:hover:not([disabled]) {
+   background: #f1f5f9;
+   transform: translateY(-1px);
+}
+
+.pageButton[disabled] {
+   opacity: 0.6;
+   cursor: default;
+}
+
+/* На очень маленьких экранах — кнопки двух в ряд */
+@media (max-width: 420px) {
+   .pageButton {
+      flex: 1 1 45%;
+      /* займёт ~2 кнопки в ряд */
+      min-width: 0;
+   }
+}
+
+/* На средних экранах — несколько кнопок в ряд, но не растягивать слишком сильно */
+@media (min-width: 421px) and (max-width: 800px) {
+   .pageButton {
+      flex: 0 1 auto;
+   }
+}
