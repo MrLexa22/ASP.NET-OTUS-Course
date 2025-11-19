@@ -4,6 +4,8 @@ import App from './App';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthProvider';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 const theme = createTheme({
   palette: {
@@ -21,11 +23,13 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </AuthProvider>
+      <Provider store={store}>
+        <AuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthProvider>
+      </Provider>
     </ThemeProvider>
   </React.StrictMode>
 );
