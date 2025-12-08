@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="DebugOneServer" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="aspnetwithreactonehost.client/aspnetwithreactonehost.client.esproj">
+    <Build Solution="Release|*" />
+    <Deploy Solution="Release|*" />
+  </Project>
+  <Project Path="AspNetWithReactOneHost.Server/AspNetWithReactOneHost.Server.csproj" />
+</Solution>
