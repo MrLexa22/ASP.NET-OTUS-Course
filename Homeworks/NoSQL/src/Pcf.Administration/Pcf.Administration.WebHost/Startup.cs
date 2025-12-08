@@ -14,6 +14,7 @@ using Pcf.Administration.Core.Abstractions.Repositories;
 using Pcf.Administration.DataAccess;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.DataAccess.Repositories;
+using Pcf.Administration.DataAccess.MongoDb;
 using Pcf.Administration.Core.Domain.Administration;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
@@ -34,15 +35,32 @@ namespace Pcf.Administration.WebHost
         {
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
+
+            // Выбор базы данных: EF Core (PostgreSQL) или MongoDB
+            var useMongoDb = Configuration.GetValue<bool>("UseMongoDb", false);
+
+            if (useMongoDb)
             {
-                //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
-            });
+                // Конфигурация MongoDB
+                var mongoDbSettings = Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+                services.AddSingleton(mongoDbSettings);
+                services.AddSingleton<MongoDbContext>();
+                services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
+                services.AddScoped<IDbInitializer, MongoDbInitializer>();
+            }
+            else
+            {
+                // Конфигурация Entity Framework Core
+                services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+                services.AddScoped<IDbInitializer, EfDbInitializer>();
+                services.AddDbContext<DataContext>(x =>
+                {
+                    //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
+                    x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
+                    x.UseSnakeCaseNamingConvention();
+                    x.UseLazyLoadingProxies();
+                });
+            }
 
             services.AddOpenApiDocument(options =>
             {

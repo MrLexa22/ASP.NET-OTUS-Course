@@ -1,21 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Castle.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Data;
+using Pcf.GivingToCustomer.DataAccess.MongoDb;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Integration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Pcf.GivingToCustomer.WebHost
@@ -35,16 +36,33 @@ namespace Pcf.GivingToCustomer.WebHost
         {
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+
             services.AddScoped<INotificationGateway, NotificationGateway>();
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
+
+            // Выбор базы данных: EF Core (PostgreSQL) или MongoDB
+            var useMongoDb = Configuration.GetValue<bool>("UseMongoDb", false);
+
+            if (useMongoDb)
             {
-                //x.UseSqlite("Filename=PromocodeFactoryGivingToCustomerDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryGivingToCustomerDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
-            });
+                // Конфигурация MongoDB
+                var mongoDbSettings = Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+                services.AddSingleton(mongoDbSettings);
+                services.AddSingleton<MongoDbContext>();
+                services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
+                services.AddScoped<IDbInitializer, MongoDbInitializer>();
+            }
+            else
+            {
+                services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+                services.AddScoped<IDbInitializer, EfDbInitializer>();
+                services.AddDbContext<DataContext>(x =>
+                {
+                    //x.UseSqlite("Filename=PromocodeFactoryGivingToCustomerDb.sqlite");
+                    x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryGivingToCustomerDb"));
+                    x.UseSnakeCaseNamingConvention();
+                    x.UseLazyLoadingProxies();
+                });
+            }
 
             services.AddOpenApiDocument(options =>
             {
